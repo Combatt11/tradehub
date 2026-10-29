@@ -112,7 +112,7 @@ public final class ProductMapper {
         return entity;
     }
 
-    private static Variant toDomain(VariantEntity entity) {
+    public static Variant toDomain(VariantEntity entity) {
         return new Variant(
                 entity.getId(),
                 entity.getSku(),
