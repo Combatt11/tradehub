@@ -1,0 +1,64 @@
+name: nexusmarket
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: nexusmarket-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-nexusmarket}
+      MYSQL_USER: ${DB_USERNAME:-nexusmarket}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-nexusmarket}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      TZ: UTC
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - nexusmarket-net
+
+  mongodb:
+    image: mongo:7.0
+    container_name: nexusmarket-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME:-nexusmarket}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-nexusmarket}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-nexusmarket}
+      TZ: UTC
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - nexusmarket-net
+
+volumes:
+  mysql_data:
+    name: nexusmarket-mysql-data
+  mongodb_data:
+    name: nexusmarket-mongodb-data
+  mongodb_config:
+    name: nexusmarket-mongodb-config
+
+networks:
+  nexusmarket-net:
+    name: nexusmarket-net
+    driver: bridge
