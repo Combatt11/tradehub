@@ -3,8 +3,10 @@ package com.nexusmarket.infrastructure.config;
 import com.nexusmarket.application.services.AuthApplicationService;
 import com.nexusmarket.application.services.CheckoutApplicationService;
 import com.nexusmarket.application.services.ProductApplicationService;
+import com.nexusmarket.application.services.ReportApplicationService;
 import com.nexusmarket.domain.ports.in.CheckoutUseCase;
 import com.nexusmarket.domain.ports.in.CreateOrderUseCase;
+import com.nexusmarket.domain.ports.in.GetSalesReportUseCase;
 import com.nexusmarket.domain.ports.in.ManageCartUseCase;
 import com.nexusmarket.domain.ports.in.ManageProductUseCase;
 import com.nexusmarket.domain.ports.in.ReserveInventoryUseCase;
@@ -98,5 +100,12 @@ public class BeanConfiguration {
                 shoppingCartRepositoryPort,
                 DatabaseSeeder.DEFAULT_WAREHOUSE_ID
         );
+    }
+
+    @Bean
+    public GetSalesReportUseCase getSalesReportUseCase(
+            OrderRepositoryPort orderRepositoryPort
+    ) {
+        return new ReportApplicationService(orderRepositoryPort);
     }
 }

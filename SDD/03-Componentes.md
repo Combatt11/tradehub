@@ -14,16 +14,16 @@ Adaptadores de entrada -> Puertos de entrada -> Servicios de dominio/aplicación
 ```mermaid
 graph TD
     subgraph IN["Adaptadores de Entrada"]
-        REST["REST Controllers<br/>AuthController<br/>ProductController<br/>CartController<br/>CheckoutController<br/>OrderController<br/>InventoryController"]
+        REST["REST Controllers<br/>AuthController<br/>ProductController<br/>CartController<br/>CheckoutController<br/>OrderController<br/>InventoryController<br/>ReportController"]
         JWT["JwtAuthenticationFilter<br/>(Spring Security)"]
     end
 
     subgraph PORTS_IN["Puertos de Entrada (Use Cases)"]
-        UC["ManageCartUseCase<br/>CheckoutUseCase<br/>CreateOrderUseCase<br/>ProcessPaymentUseCase<br/>ManageProductUseCase<br/>ReserveInventoryUseCase<br/>AddInventoryUseCase"]
+        UC["ManageCartUseCase<br/>CheckoutUseCase<br/>CreateOrderUseCase<br/>ProcessPaymentUseCase<br/>ManageProductUseCase<br/>ReserveInventoryUseCase<br/>AddInventoryUseCase<br/>GetSalesReportUseCase"]
     end
 
     subgraph DOMAIN["Dominio / Aplicación"]
-        APP["Servicios de Aplicación<br/>CheckoutApplicationService<br/>AuthApplicationService<br/>ProductApplicationService"]
+        APP["Servicios de Aplicación<br/>CheckoutApplicationService<br/>AuthApplicationService<br/>ProductApplicationService<br/>ReportApplicationService"]
         SVC["Servicios de Dominio<br/>CartDomainService<br/>OrderDomainService<br/>InventoryDomainService"]
         MODEL["Modelos de Dominio<br/>User, Product, Variant<br/>InventoryItem, ShoppingCart<br/>Order, OrderLine, Money"]
     end

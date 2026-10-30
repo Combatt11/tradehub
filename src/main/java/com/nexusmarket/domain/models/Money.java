@@ -62,6 +62,17 @@ public record Money(BigDecimal amount, Currency currency) implements Comparable<
         return new Money(amount.multiply(factor), currency);
     }
 
+    public Money divide(long divisor) {
+        if (divisor <= 0) {
+            throw new IllegalArgumentException("divisor must be greater than zero");
+        }
+        int scale = Math.max(currency.getDefaultFractionDigits(), 0);
+        return new Money(
+                amount.divide(BigDecimal.valueOf(divisor), scale, RoundingMode.HALF_UP),
+                currency
+        );
+    }
+
     public Money requirePositive(String fieldName) {
         if (amount.signum() <= 0) {
             throw new IllegalArgumentException(fieldName + " must be greater than zero");

@@ -5,6 +5,8 @@ import com.nexusmarket.domain.ports.out.OrderRepositoryPort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,5 +44,16 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     public Optional<Order> findById(UUID id) {
         Objects.requireNonNull(id, "id must not be null");
         return orderRepository.findById(id).map(OrderMapper::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Order> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end) {
+        Objects.requireNonNull(start, "start must not be null");
+        Objects.requireNonNull(end, "end must not be null");
+
+        return orderRepository.findAllByCreatedAtBetween(start, end).stream()
+                .map(OrderMapper::toDomain)
+                .toList();
     }
 }

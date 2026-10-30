@@ -1,5 +1,7 @@
 package com.nexusmarket.domain.models;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashSet;
@@ -21,6 +23,7 @@ public final class Order {
     private final UUID buyerId;
     private final UUID sellerId;
     private final List<OrderLine> lines;
+    private final LocalDateTime createdAt;
     private Money totalAmount;
     private OrderStatus status;
 
@@ -32,12 +35,25 @@ public final class Order {
             Money totalAmount,
             OrderStatus status
     ) {
+        this(id, buyerId, sellerId, lines, totalAmount, status, LocalDateTime.now(ZoneOffset.UTC));
+    }
+
+    public Order(
+            UUID id,
+            UUID buyerId,
+            UUID sellerId,
+            List<OrderLine> lines,
+            Money totalAmount,
+            OrderStatus status,
+            LocalDateTime createdAt
+    ) {
         this.id = Objects.requireNonNull(id, "id must not be null");
         this.buyerId = Objects.requireNonNull(buyerId, "buyerId must not be null");
         this.sellerId = Objects.requireNonNull(sellerId, "sellerId must not be null");
         this.lines = new ArrayList<>(Objects.requireNonNull(lines, "lines must not be null"));
         this.totalAmount = Objects.requireNonNull(totalAmount, "totalAmount must not be null");
         this.status = Objects.requireNonNull(status, "status must not be null");
+        this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
 
         validateLines(this.lines, this.totalAmount.currency());
 
@@ -208,6 +224,10 @@ public final class Order {
 
     public OrderStatus getStatus() {
         return status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     private Money calculateTotal() {

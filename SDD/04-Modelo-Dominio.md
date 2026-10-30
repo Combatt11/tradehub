@@ -64,6 +64,7 @@ classDiagram
         +List~OrderLine~ lines
         +Money totalAmount
         +OrderStatus status
+        +LocalDateTime createdAt
         +addLine(OrderLine line) void
         +removeLine(UUID variantId) void
         +markAsPaid() void
@@ -102,6 +103,7 @@ classDiagram
         +Currency currency
         +plus(Money other) Money
         +multiply(int factor) Money
+        +divide(long divisor) Money
         +isPositive() boolean
     }
 

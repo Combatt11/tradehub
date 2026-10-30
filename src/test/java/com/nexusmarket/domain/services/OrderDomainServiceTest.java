@@ -1,5 +1,6 @@
 package com.nexusmarket.domain.services;
 
+import com.nexusmarket.domain.models.InvalidOrderStateException;
 import com.nexusmarket.domain.models.Money;
 import com.nexusmarket.domain.models.Order;
 import com.nexusmarket.domain.models.OrderLine;
@@ -144,7 +145,50 @@ class OrderDomainServiceTest {
         verify(orderRepository).save(order);
     }
 
+    @Test
+    void processPaymentThrowsWhenOrderIsCancelled() {
+        UUID orderId = UUID.randomUUID();
+        Order order = orderWithLine(orderId, buyerId, "10.00", OrderStatus.CANCELLED);
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        assertThrows(
+                InvalidOrderStateException.class,
+                () -> orderDomainService.processPayment(orderId, buyerId)
+        );
+
+        assertEquals(OrderStatus.CANCELLED, order.getStatus());
+        verifyNoInteractions(paymentGateway);
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void processPaymentThrowsWhenOrderIsAlreadyPaid() {
+        UUID orderId = UUID.randomUUID();
+        Order order = orderWithLine(orderId, buyerId, "10.00", OrderStatus.PAID);
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        assertThrows(
+                InvalidOrderStateException.class,
+                () -> orderDomainService.processPayment(orderId, buyerId)
+        );
+
+        assertEquals(OrderStatus.PAID, order.getStatus());
+        verifyNoInteractions(paymentGateway);
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
     private Order orderWithLine(UUID orderId, UUID orderBuyerId, String unitPrice) {
+        return orderWithLine(orderId, orderBuyerId, unitPrice, OrderStatus.PENDING_PAYMENT);
+    }
+
+    private Order orderWithLine(
+            UUID orderId,
+            UUID orderBuyerId,
+            String unitPrice,
+            OrderStatus status
+    ) {
         Money price = Money.of(unitPrice, "USD");
         UUID variantId = UUID.randomUUID();
 
@@ -154,7 +198,7 @@ class OrderDomainServiceTest {
                 sellerId,
                 List.of(new OrderLine(variantId, 1, price)),
                 price,
-                OrderStatus.PENDING_PAYMENT
+                status
         );
     }
 }

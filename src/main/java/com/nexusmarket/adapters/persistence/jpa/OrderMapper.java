@@ -35,7 +35,8 @@ public final class OrderMapper {
                 entity.getSellerId(),
                 lines,
                 toMoney(entity.getTotalAmount(), entity.getCurrency()),
-                entity.getStatus()
+                entity.getStatus(),
+                entity.getCreatedAt()
         );
     }
 
@@ -96,6 +97,7 @@ public final class OrderMapper {
         entity.setTotalAmount(order.getTotalAmount().amount());
         entity.setCurrency(order.getTotalAmount().currency().getCurrencyCode());
         entity.setStatus(order.getStatus());
+        entity.setCreatedAt(order.getCreatedAt());
     }
 
     private static OrderLineEntity toEntity(OrderLine line, OrderEntity order) {

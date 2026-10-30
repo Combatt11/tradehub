@@ -29,6 +29,7 @@ Este documento resume los endpoints principales de NexusMarket, su autenticació
 | `POST` | `/api/cart/items` | JWT, `BUYER` | `AddCartItemRequestDTO` | `200 OK` + `CartResponseDTO` | `400 Bad Request`, `401 Unauthorized`, `403 Forbidden` |
 | `POST` | `/api/checkout` | JWT, `BUYER` | Sin cuerpo | `201 Created` + `CheckoutResponseDTO` | `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `409 Conflict` |
 | `POST` | `/api/orders/{id}/pay` | JWT, `BUYER` propietario | Sin cuerpo | `200 OK` + `PaymentResponseDTO` | `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `409 Conflict` |
+| `GET` | `/api/reports/sales` | JWT, `ADMINISTRATOR` | Query `start` y `end` ISO-8601 | `200 OK` + `SalesReportDTO` | `400 Bad Request`, `401 Unauthorized`, `403 Forbidden` |
 
 ## Detalle de los endpoints principales
 
@@ -153,6 +154,42 @@ Errores:
 | `403 Forbidden` | El usuario no es `BUYER` o la orden pertenece a otro comprador. |
 | `404 Not Found` | La orden no existe. |
 | `409 Conflict` | La orden no está en `PENDING_PAYMENT` o el total no es positivo. |
+
+### `GET /api/reports/sales`
+
+Requiere el rol `ADMINISTRATOR`. El rango es inclusivo y se expresa en UTC con formato ISO-8601.
+
+Ejemplo:
+
+```http
+GET /api/reports/sales?start=2026-10-01T00:00:00&end=2026-10-31T23:59:59
+```
+
+Respuesta `200 OK`:
+
+```json
+{
+  "totalFacturado": {
+    "amount": 150.00,
+    "currency": "USD"
+  },
+  "numeroOrdenes": 2,
+  "ticketPromedio": {
+    "amount": 75.00,
+    "currency": "USD"
+  }
+}
+```
+
+El reporte contabiliza únicamente órdenes con pago capturado. El GMV se calcula antes de reembolsos, conforme al catálogo de métricas de la especificación.
+
+Errores:
+
+| Código | Causa |
+| --- | --- |
+| `400 Bad Request` | Rango inválido, fechas ausentes o formato incorrecto. |
+| `401 Unauthorized` | Falta el token o es inválido. |
+| `403 Forbidden` | El usuario no tiene rol `ADMINISTRATOR`. |
 
 ## Endpoints secundarios
 
