@@ -9,11 +9,11 @@ import java.util.UUID;
 
 /**
  * Peticion para crear una orden.
+ *
+ * <p>El comprador se obtiene del token JWT. El vendedor sigue identificando la
+ * parte del catalogo sobre la que se crea la orden.</p>
  */
 public record OrderRequestDTO(
-        @NotNull(message = "buyerId is required")
-        UUID buyerId,
-
         @NotNull(message = "sellerId is required")
         UUID sellerId,
 

@@ -1,5 +1,6 @@
 package com.nexusmarket.infrastructure.config;
 
+import com.nexusmarket.application.services.AuthApplicationService;
 import com.nexusmarket.application.services.CheckoutApplicationService;
 import com.nexusmarket.application.services.ProductApplicationService;
 import com.nexusmarket.domain.ports.in.CheckoutUseCase;
@@ -7,9 +8,12 @@ import com.nexusmarket.domain.ports.in.CreateOrderUseCase;
 import com.nexusmarket.domain.ports.in.ManageProductUseCase;
 import com.nexusmarket.domain.ports.in.ReserveInventoryUseCase;
 import com.nexusmarket.domain.ports.out.InventoryRepositoryPort;
+import com.nexusmarket.domain.ports.out.JwtTokenPort;
 import com.nexusmarket.domain.ports.out.OrderRepositoryPort;
+import com.nexusmarket.domain.ports.out.PasswordHasherPort;
 import com.nexusmarket.domain.ports.out.PaymentGatewayPort;
 import com.nexusmarket.domain.ports.out.ProductRepositoryPort;
+import com.nexusmarket.domain.ports.out.UserRepositoryPort;
 import com.nexusmarket.domain.ports.out.VariantRepositoryPort;
 import com.nexusmarket.domain.services.InventoryDomainService;
 import com.nexusmarket.domain.services.OrderDomainService;
@@ -51,6 +55,19 @@ public class BeanConfiguration {
             ProductRepositoryPort productRepositoryPort
     ) {
         return new ProductApplicationService(productRepositoryPort);
+    }
+
+    @Bean
+    public AuthApplicationService authApplicationService(
+            UserRepositoryPort userRepositoryPort,
+            PasswordHasherPort passwordHasherPort,
+            JwtTokenPort jwtTokenPort
+    ) {
+        return new AuthApplicationService(
+                userRepositoryPort,
+                passwordHasherPort,
+                jwtTokenPort
+        );
     }
 
     @Bean

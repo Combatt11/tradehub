@@ -88,12 +88,13 @@ public final class RestMapper {
     /**
      * Convierte la peticion en un producto borrador listo para persistir.
      */
-    public static Product toProduct(ProductRequestDTO request) {
+    public static Product toProduct(UUID sellerId, ProductRequestDTO request) {
+        Objects.requireNonNull(sellerId, "sellerId must not be null");
         Objects.requireNonNull(request, "request must not be null");
 
         return new Product(
                 UUID.randomUUID(),
-                request.sellerId(),
+                sellerId,
                 request.name(),
                 request.description(),
                 request.type(),

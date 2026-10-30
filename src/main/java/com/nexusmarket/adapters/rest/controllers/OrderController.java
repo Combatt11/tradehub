@@ -4,6 +4,7 @@ import com.nexusmarket.adapters.rest.dto.OrderRequestDTO;
 import com.nexusmarket.adapters.rest.dto.OrderResponseDTO;
 import com.nexusmarket.adapters.rest.dto.PaymentResponseDTO;
 import com.nexusmarket.adapters.rest.mappers.RestMapper;
+import com.nexusmarket.adapters.security.AuthenticatedUser;
 import com.nexusmarket.domain.models.Order;
 import com.nexusmarket.domain.ports.in.CreateOrderUseCase;
 import com.nexusmarket.domain.ports.in.ProcessPaymentUseCase;
@@ -11,6 +12,8 @@ import com.nexusmarket.domain.ports.out.PaymentGatewayPort.PaymentResult;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,11 +44,13 @@ public class OrderController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('BUYER')")
     public ResponseEntity<OrderResponseDTO> createOrder(
+            @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody OrderRequestDTO request
     ) {
         Order order = createOrderUseCase.createOrder(
-                request.buyerId(),
+                user.id(),
                 request.sellerId(),
                 RestMapper.toOrderLineInputs(request.lines())
         );
@@ -55,6 +60,7 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/pay")
+    @PreAuthorize("hasRole('BUYER')")
     public ResponseEntity<PaymentResponseDTO> payOrder(
             @PathVariable("id") UUID id
     ) {

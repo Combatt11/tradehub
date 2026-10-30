@@ -7,15 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Peticion para crear un producto.
+ *
+ * <p>El vendedor se obtiene del token JWT, nunca del cuerpo de la peticion.</p>
  */
 public record ProductRequestDTO(
-        @NotNull(message = "sellerId is required")
-        UUID sellerId,
-
         @NotBlank(message = "name is required")
         @Size(max = 200, message = "name must not exceed 200 characters")
         String name,

@@ -3,11 +3,14 @@ package com.nexusmarket.adapters.rest.controllers;
 import com.nexusmarket.adapters.rest.dto.ProductRequestDTO;
 import com.nexusmarket.adapters.rest.dto.ProductResponseDTO;
 import com.nexusmarket.adapters.rest.mappers.RestMapper;
+import com.nexusmarket.adapters.security.AuthenticatedUser;
 import com.nexusmarket.domain.models.Product;
 import com.nexusmarket.domain.ports.in.ManageProductUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +33,13 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('SELLER', 'ADMINISTRATOR')")
     public ResponseEntity<ProductResponseDTO> createProduct(
+            @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody ProductRequestDTO request
     ) {
         Product product = manageProductUseCase.createProduct(
-                request.sellerId(),
+                user.id(),
                 request.name(),
                 request.description(),
                 request.type(),

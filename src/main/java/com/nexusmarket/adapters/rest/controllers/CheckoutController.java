@@ -2,10 +2,13 @@ package com.nexusmarket.adapters.rest.controllers;
 
 import com.nexusmarket.adapters.rest.dto.CheckoutRequestDTO;
 import com.nexusmarket.adapters.rest.dto.CheckoutResponseDTO;
+import com.nexusmarket.adapters.security.AuthenticatedUser;
 import com.nexusmarket.domain.ports.in.CheckoutUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +31,13 @@ public class CheckoutController {
     }
 
     @PostMapping("/api/checkout")
+    @PreAuthorize("hasRole('BUYER')")
     public ResponseEntity<CheckoutResponseDTO> checkout(
+            @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody CheckoutRequestDTO request
     ) {
         List<UUID> orderIds = checkoutUseCase.checkout(
-                request.buyerId(),
+                user.id(),
                 request.items()
         );
 

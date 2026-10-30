@@ -7,6 +7,7 @@ import com.nexusmarket.domain.models.InventoryItem;
 import com.nexusmarket.domain.ports.in.ReserveInventoryUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ public class InventoryController {
     }
 
     @PostMapping("/reserve")
+    @PreAuthorize("hasAnyRole('SELLER', 'LOGISTICS_OPERATOR', 'ADMINISTRATOR')")
     public ResponseEntity<InventoryResponseDTO> reserveStock(
             @Valid @RequestBody InventoryRequestDTO request
     ) {
