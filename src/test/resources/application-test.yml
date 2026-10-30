@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: "jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  data:
+    mongodb:
+      uri: "mongodb://localhost:27017/test"
+
+  # El test de integracion no necesita MongoDB: el repositorio de auditoria
+  # se reemplaza por un mock en E2EFlowIntegrationTest.
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration
+
+nexusmarket:
+  security:
+    jwt:
+      secret: "test-secret-key-for-nexusmarket-e2e-32chars"
+      expiration: 900000
+  payment:
+    success-probability: 1.0

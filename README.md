@@ -194,6 +194,7 @@ El proyecto utiliza **JUnit 5** y **Mockito**. La suite incluye:
 - Tests unitarios de modelos y servicios de dominio.
 - Tests de aplicación para checkout, rollback y pago rechazado.
 - Tests de integración de la capa web con `@WebMvcTest` para validar seguridad, RBAC y códigos HTTP.
+- Test end-to-end con `@SpringBootTest(RANDOM_PORT)`, `TestRestTemplate` y H2 en memoria: registra vendedor y comprador, crea producto, aprovisiona inventario, añade al carrito, hace checkout y paga la orden. No requiere MySQL ni MongoDB locales; el repositorio de auditoría se mockea con el perfil `test`.
 
 Ejecuta todos los tests con:
 
