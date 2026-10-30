@@ -1,0 +1,14 @@
+package com.nexusmarket.adapters.persistence.jpa;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+/**
+ * Repositorio Spring Data JPA para carritos.
+ */
+public interface JpaCartRepository extends JpaRepository<CartEntity, UUID> {
+
+    Optional<CartEntity> findByBuyerId(UUID buyerId);
+}

@@ -5,6 +5,7 @@ import com.nexusmarket.application.services.CheckoutApplicationService;
 import com.nexusmarket.application.services.ProductApplicationService;
 import com.nexusmarket.domain.ports.in.CheckoutUseCase;
 import com.nexusmarket.domain.ports.in.CreateOrderUseCase;
+import com.nexusmarket.domain.ports.in.ManageCartUseCase;
 import com.nexusmarket.domain.ports.in.ManageProductUseCase;
 import com.nexusmarket.domain.ports.in.ReserveInventoryUseCase;
 import com.nexusmarket.domain.ports.out.InventoryRepositoryPort;
@@ -13,8 +14,10 @@ import com.nexusmarket.domain.ports.out.OrderRepositoryPort;
 import com.nexusmarket.domain.ports.out.PasswordHasherPort;
 import com.nexusmarket.domain.ports.out.PaymentGatewayPort;
 import com.nexusmarket.domain.ports.out.ProductRepositoryPort;
+import com.nexusmarket.domain.ports.out.ShoppingCartRepositoryPort;
 import com.nexusmarket.domain.ports.out.UserRepositoryPort;
 import com.nexusmarket.domain.ports.out.VariantRepositoryPort;
+import com.nexusmarket.domain.services.CartDomainService;
 import com.nexusmarket.domain.services.InventoryDomainService;
 import com.nexusmarket.domain.services.OrderDomainService;
 import com.nexusmarket.infrastructure.seed.DatabaseSeeder;
@@ -58,6 +61,13 @@ public class BeanConfiguration {
     }
 
     @Bean
+    public ManageCartUseCase manageCartUseCase(
+            ShoppingCartRepositoryPort shoppingCartRepositoryPort
+    ) {
+        return new CartDomainService(shoppingCartRepositoryPort);
+    }
+
+    @Bean
     public AuthApplicationService authApplicationService(
             UserRepositoryPort userRepositoryPort,
             PasswordHasherPort passwordHasherPort,
@@ -76,7 +86,8 @@ public class BeanConfiguration {
             ReserveInventoryUseCase reserveInventoryUseCase,
             VariantRepositoryPort variantRepositoryPort,
             OrderRepositoryPort orderRepositoryPort,
-            InventoryRepositoryPort inventoryRepositoryPort
+            InventoryRepositoryPort inventoryRepositoryPort,
+            ShoppingCartRepositoryPort shoppingCartRepositoryPort
     ) {
         return new CheckoutApplicationService(
                 createOrderUseCase,
@@ -84,6 +95,7 @@ public class BeanConfiguration {
                 variantRepositoryPort,
                 orderRepositoryPort,
                 inventoryRepositoryPort,
+                shoppingCartRepositoryPort,
                 DatabaseSeeder.DEFAULT_WAREHOUSE_ID
         );
     }

@@ -13,7 +13,8 @@ public interface ProcessPaymentUseCase {
      * Procesa el pago de una orden, actualiza su estado y la persiste.
      *
      * @param orderId identificador de la orden
+     * @param buyerId comprador autenticado que debe ser propietario de la orden
      * @return resultado de la pasarela
      */
-    PaymentResult processPayment(UUID orderId);
+    PaymentResult processPayment(UUID orderId, UUID buyerId);
 }

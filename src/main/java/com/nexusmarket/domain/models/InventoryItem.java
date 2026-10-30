@@ -80,12 +80,20 @@ public final class InventoryItem {
     }
 
     /**
+     * Añade stock disponible, por ejemplo para el aprovisionamiento inicial o
+     * una reposicion manual.
+     */
+    public void addStock(int quantity) {
+        requirePositive(quantity);
+        availableStock = Math.addExact(availableStock, quantity);
+    }
+
+    /**
      * Repone stock fisico, por ejemplo tras una cancelacion pagada o una
      * devolucion aceptada.
      */
     public void restock(int quantity) {
-        requirePositive(quantity);
-        availableStock = Math.addExact(availableStock, quantity);
+        addStock(quantity);
     }
 
     public int onHandStock() {

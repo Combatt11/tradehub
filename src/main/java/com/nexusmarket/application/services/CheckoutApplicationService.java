@@ -1,6 +1,8 @@
 package com.nexusmarket.application.services;
 
+import com.nexusmarket.domain.models.CartItem;
 import com.nexusmarket.domain.models.Order;
+import com.nexusmarket.domain.models.ShoppingCart;
 import com.nexusmarket.domain.ports.in.CheckoutItemDTO;
 import com.nexusmarket.domain.ports.in.CheckoutUseCase;
 import com.nexusmarket.domain.ports.in.CreateOrderUseCase;
@@ -8,6 +10,7 @@ import com.nexusmarket.domain.ports.in.CreateOrderUseCase.OrderLineInput;
 import com.nexusmarket.domain.ports.in.ReserveInventoryUseCase;
 import com.nexusmarket.domain.ports.out.InventoryRepositoryPort;
 import com.nexusmarket.domain.ports.out.OrderRepositoryPort;
+import com.nexusmarket.domain.ports.out.ShoppingCartRepositoryPort;
 import com.nexusmarket.domain.ports.out.VariantRepositoryPort;
 
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ public final class CheckoutApplicationService implements CheckoutUseCase {
     private final VariantRepositoryPort variantRepository;
     private final OrderRepositoryPort orderRepository;
     private final InventoryRepositoryPort inventoryRepository;
+    private final ShoppingCartRepositoryPort shoppingCartRepository;
     private final UUID defaultWarehouseId;
 
     public CheckoutApplicationService(
@@ -40,6 +44,7 @@ public final class CheckoutApplicationService implements CheckoutUseCase {
             VariantRepositoryPort variantRepository,
             OrderRepositoryPort orderRepository,
             InventoryRepositoryPort inventoryRepository,
+            ShoppingCartRepositoryPort shoppingCartRepository,
             UUID defaultWarehouseId
     ) {
         this.createOrderUseCase = Objects.requireNonNull(
@@ -52,21 +57,27 @@ public final class CheckoutApplicationService implements CheckoutUseCase {
                 orderRepository, "orderRepository must not be null");
         this.inventoryRepository = Objects.requireNonNull(
                 inventoryRepository, "inventoryRepository must not be null");
+        this.shoppingCartRepository = Objects.requireNonNull(
+                shoppingCartRepository, "shoppingCartRepository must not be null");
         this.defaultWarehouseId = Objects.requireNonNull(
                 defaultWarehouseId, "defaultWarehouseId must not be null");
     }
 
     @Override
-    public List<UUID> checkout(UUID buyerId, List<CheckoutItemDTO> items) {
+    public List<UUID> checkout(UUID buyerId) {
         Objects.requireNonNull(buyerId, "buyerId must not be null");
-        Objects.requireNonNull(items, "items must not be null");
 
-        if (items.isEmpty()) {
-            throw new IllegalArgumentException("Checkout must contain at least one item");
+        ShoppingCart cart = shoppingCartRepository.findByBuyerId(buyerId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Cart not found for buyer: " + buyerId));
+
+        if (cart.getItems().isEmpty()) {
+            throw new IllegalStateException("Cart is empty for buyer: " + buyerId);
         }
-        for (CheckoutItemDTO item : items) {
-            Objects.requireNonNull(item, "items must not contain null elements");
-        }
+
+        List<CheckoutItemDTO> items = cart.getItems().stream()
+                .map(this::toCheckoutItem)
+                .toList();
 
         Map<UUID, List<OrderLineInput>> itemsBySeller = groupBySeller(items);
         List<UUID> createdOrderIds = new ArrayList<>();
@@ -92,12 +103,18 @@ public final class CheckoutApplicationService implements CheckoutUseCase {
                 }
             }
 
+            shoppingCartRepository.deleteByBuyerId(buyerId);
+
             return List.copyOf(createdOrderIds);
         } catch (RuntimeException exception) {
             rollbackReservations(reservations, exception);
             rollbackOrders(createdOrderIds, exception);
             throw exception;
         }
+    }
+
+    private CheckoutItemDTO toCheckoutItem(CartItem cartItem) {
+        return new CheckoutItemDTO(cartItem.variantId(), cartItem.quantity());
     }
 
     private Map<UUID, List<OrderLineInput>> groupBySeller(List<CheckoutItemDTO> items) {

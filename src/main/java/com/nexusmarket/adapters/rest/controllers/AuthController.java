@@ -6,6 +6,8 @@ import com.nexusmarket.adapters.rest.dto.RegisterRequestDTO;
 import com.nexusmarket.adapters.rest.mappers.AuthRestMapper;
 import com.nexusmarket.application.services.AuthApplicationService;
 import com.nexusmarket.application.services.AuthApplicationService.AuthResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticación", description = "Registro e inicio de sesión")
 public class AuthController {
 
     private final AuthApplicationService authApplicationService;
@@ -31,6 +34,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registra un nuevo comprador o vendedor")
     public ResponseEntity<AuthResponseDTO> register(
             @Valid @RequestBody RegisterRequestDTO request
     ) {
@@ -46,6 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Inicia sesión y obtiene un token JWT")
     public ResponseEntity<AuthResponseDTO> login(
             @Valid @RequestBody LoginRequestDTO request
     ) {

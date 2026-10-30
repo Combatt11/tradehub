@@ -9,6 +9,9 @@ import com.nexusmarket.domain.models.Order;
 import com.nexusmarket.domain.ports.in.CreateOrderUseCase;
 import com.nexusmarket.domain.ports.in.ProcessPaymentUseCase;
 import com.nexusmarket.domain.ports.out.PaymentGatewayPort.PaymentResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,8 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/orders")
+@Tag(name = "Órdenes", description = "Operaciones de órdenes y pagos")
+@SecurityRequirement(name = "bearerAuth")
 public class OrderController {
 
     private final CreateOrderUseCase createOrderUseCase;
@@ -45,6 +50,7 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasRole('BUYER')")
+    @Operation(summary = "Crea una orden para un vendedor")
     public ResponseEntity<OrderResponseDTO> createOrder(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody OrderRequestDTO request
@@ -61,10 +67,12 @@ public class OrderController {
 
     @PostMapping("/{id}/pay")
     @PreAuthorize("hasRole('BUYER')")
+    @Operation(summary = "Procesa el pago de una orden del comprador autenticado")
     public ResponseEntity<PaymentResponseDTO> payOrder(
+            @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("id") UUID id
     ) {
-        PaymentResult result = processPaymentUseCase.processPayment(id);
+        PaymentResult result = processPaymentUseCase.processPayment(id, user.id());
         return ResponseEntity.ok(RestMapper.toPaymentResponse(result));
     }
 }

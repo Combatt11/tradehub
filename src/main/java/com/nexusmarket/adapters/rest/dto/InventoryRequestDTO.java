@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 /**
- * Peticion para reservar stock.
+ * Peticion de inventario para reservar o aprovisionar stock.
  */
 public record InventoryRequestDTO(
         @NotNull(message = "variantId is required")

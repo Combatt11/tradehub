@@ -5,6 +5,7 @@ import com.nexusmarket.domain.models.Order;
 import com.nexusmarket.domain.models.OrderLine;
 import com.nexusmarket.domain.models.OrderStatus;
 import com.nexusmarket.domain.models.InvalidOrderStateException;
+import com.nexusmarket.domain.models.UnauthorizedOperationException;
 import com.nexusmarket.domain.models.Variant;
 import com.nexusmarket.domain.ports.in.CreateOrderUseCase;
 import com.nexusmarket.domain.ports.in.CreateOrderUseCase.OrderLineInput;
@@ -94,11 +95,17 @@ public final class OrderDomainService implements CreateOrderUseCase, ProcessPaym
     }
 
     @Override
-    public PaymentResult processPayment(UUID orderId) {
+    public PaymentResult processPayment(UUID orderId, UUID buyerId) {
         Objects.requireNonNull(orderId, "orderId must not be null");
+        Objects.requireNonNull(buyerId, "buyerId must not be null");
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NoSuchElementException("Order not found: " + orderId));
+
+        if (!order.getBuyerId().equals(buyerId)) {
+            throw new UnauthorizedOperationException(
+                    "Order " + orderId + " does not belong to buyer " + buyerId);
+        }
 
         OrderStatus currentStatus = order.getStatus();
         if (currentStatus != OrderStatus.PENDING_PAYMENT) {

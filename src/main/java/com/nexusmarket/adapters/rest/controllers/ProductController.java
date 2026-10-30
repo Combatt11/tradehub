@@ -6,6 +6,9 @@ import com.nexusmarket.adapters.rest.mappers.RestMapper;
 import com.nexusmarket.adapters.security.AuthenticatedUser;
 import com.nexusmarket.domain.models.Product;
 import com.nexusmarket.domain.ports.in.ManageProductUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,8 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping("/api/products")
+@Tag(name = "Productos", description = "Operaciones de gestión de productos")
+@SecurityRequirement(name = "bearerAuth")
 public class ProductController {
 
     private final ManageProductUseCase manageProductUseCase;
@@ -34,6 +39,7 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('SELLER', 'ADMINISTRATOR')")
+    @Operation(summary = "Crea un producto para el vendedor autenticado")
     public ResponseEntity<ProductResponseDTO> createProduct(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody ProductRequestDTO request

@@ -12,11 +12,11 @@ import java.util.UUID;
 public interface CheckoutUseCase {
 
     /**
-     * Procesa el carrito y devuelve los identificadores de las ordenes creadas.
+     * Procesa el carrito del comprador y devuelve los identificadores de las
+     * ordenes creadas.
      *
      * @param buyerId comprador propietario del carrito
-     * @param items   variantes y cantidades del carrito
      * @return IDs de las ordenes creadas, una por vendedor
      */
-    List<UUID> checkout(UUID buyerId, List<CheckoutItemDTO> items);
+    List<UUID> checkout(UUID buyerId);
 }

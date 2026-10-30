@@ -4,6 +4,7 @@ import com.nexusmarket.adapters.rest.dto.ErrorResponseDTO;
 import com.nexusmarket.domain.models.InsufficientStockException;
 import com.nexusmarket.domain.models.InvalidCredentialsException;
 import com.nexusmarket.domain.models.InvalidOrderStateException;
+import com.nexusmarket.domain.models.UnauthorizedOperationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,11 +31,23 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleIllegalState(IllegalStateException exception) {
+        return buildError(HttpStatus.CONFLICT, exception.getMessage());
+    }
+
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ErrorResponseDTO> handleInvalidCredentials(
             InvalidCredentialsException exception
     ) {
         return buildError(HttpStatus.UNAUTHORIZED, exception.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedOperationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleUnauthorizedOperation(
+            UnauthorizedOperationException exception
+    ) {
+        return buildError(HttpStatus.FORBIDDEN, exception.getMessage());
     }
 
     @ExceptionHandler(InsufficientStockException.class)
